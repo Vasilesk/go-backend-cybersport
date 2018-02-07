@@ -20,20 +20,54 @@ func SolveMethod(method string, data apiobjects.BaseRequest) apiobjects.IRespons
 		return playersGet(&data)
 	case "players.add":
 		return playersAdd(&data)
+	case "players.update":
+		return playersUpdate(&data)
+	case "players.getById":
+		return playersGetByID(&data)
 	}
 
 	eText := "unknown method"
 	return apiobjects.ErrorResponse{Error: &eText}
 }
 
-func playersGet(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+func playersGetByID(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
-	resData["name"] = "vasya"
-	resData["count"] = 100500
 	res := apiobjects.BaseResponse{Data: &resData}
 
-	// offset, limit
-	items, err := db.SelectPlayers(100, 50)
+	if pData.ID == nil {
+		errorDesc := "id is not set"
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
+
+	playerID := *pData.ID
+	var err error
+	resData["player"], err = db.SelectPlayerByID(playerID)
+	if err != nil {
+		log.Printf("error getting player by id: %v", err)
+		errorDesc := "error getting player by id"
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
+	return res
+}
+
+func playersGet(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+	resData := make(map[string]interface{})
+	// resData["count"] = 100500
+	res := apiobjects.BaseResponse{Data: &resData}
+
+	var offset uint64
+	var limit uint64
+	if pData.Offset == nil {
+		offset = 0
+	} else {
+		offset = *pData.Offset
+	}
+	if pData.Limit == nil {
+		limit = db.MaxItems
+	} else {
+		limit = *pData.Limit
+	}
+	items, err := db.SelectPlayers(offset, limit)
 	if err != nil {
 		log.Printf("error getting players: %v", err)
 	}
@@ -44,10 +78,13 @@ func playersGet(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 
 func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
-	resData["name"] = "kolya"
-	resData["count"] = 100501
-	// resData["items"] = make([]string, 0, 10)
+	// resData["count"] = 100501
 	res := apiobjects.BaseResponse{Data: &resData}
+
+	if pData.Players == nil {
+		errorDesc := "no player sent"
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
 
 	if len(*pData.Players) > db.MaxItems {
 		errorDesc := "too many players to add"
@@ -61,9 +98,30 @@ func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 		// elapsed := t.Sub(start)
 		// log.Println("time for db:", elapsed)
 		if err != nil {
-			log.Printf("error getting players: %v", err)
+			log.Printf("error adding players: %v", err)
 		}
 		resData["items"] = items
+	}
+
+	return res
+}
+
+func playersUpdate(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+	resData := make(map[string]interface{})
+	// resData["count"] = 100502
+	res := apiobjects.BaseResponse{Data: &resData}
+
+	if len(*pData.Players) > db.MaxItems {
+		errorDesc := "too many players to update"
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
+
+	if pData.Players != nil {
+		items, err := db.UpdatePlayers(*pData.Players)
+		if err != nil {
+			log.Printf("error updating players: %v", err)
+		}
+		resData["updated_ids"] = items
 	}
 
 	return res

@@ -111,16 +111,6 @@ func AddMessage(userID int, message []byte) error {
 	return nil
 }
 
-// func initDb() error {
-// 	c := getConf()
-// 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable port=5432 host=vasilesk.ru",
-// 		c.User, c.Password, c.Database)
-// 	var err error
-// 	db, err = sql.Open("postgres", dbinfo)
-//
-// 	return err
-// }
-
 func getDbConn() (*sql.DB, error) {
 	// c := getConf()
 	// dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable port=5432 host=vasilesk.ru",
