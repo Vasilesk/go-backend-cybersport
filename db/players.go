@@ -52,14 +52,16 @@ func InsertPlayers(players []apiobjects.Player) ([]uint64, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("error starting tx: %v\n", err)
+		tx.Rollback()
 		return nil, err
 	}
 
+	// stmt, err := tx.Prepare(query)
 	lenPlayers := 0
 	var newID uint64
 	for i, player := range players {
 		lenPlayers++
-		row := db.QueryRow("insert into players (name, description, logo_link, rating) values ($1, $2, $3, $4) returning ID;",
+		row := tx.QueryRow("insert into players (name, description, logo_link, rating) values ($1, $2, $3, $4) returning ID;",
 			player.Name, player.Description, player.LogoLink, player.Rating)
 		switch err := row.Scan(&newID); err {
 		case sql.ErrNoRows:

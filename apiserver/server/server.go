@@ -13,6 +13,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const debugOutput = true
+
 // IPool is an interface for the pool of workers
 type IPool interface {
 	Size() int
@@ -34,7 +36,9 @@ func methodsHandler(w http.ResponseWriter, r *http.Request) {
 		buf.ReadFrom(r.Body)
 
 		rawData := buf.Bytes()
-		println("Server got:", string(rawData))
+		if debugOutput {
+			log.Printf("Server got: %s\n", rawData)
+		}
 
 		var data apiobjects.BaseRequest
 
@@ -65,7 +69,9 @@ func methodsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		bytesResp, err := json.Marshal(resp)
-		log.Printf("response: %s", bytesResp)
+		if debugOutput {
+			log.Printf("response: %s\n", bytesResp)
+		}
 		if err != nil {
 			log.Printf("error creating json: %v", err)
 			return nil

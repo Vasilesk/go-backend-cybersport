@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const MaxItems = 100
+const MaxItems = 1000
 
 var db *sql.DB
 

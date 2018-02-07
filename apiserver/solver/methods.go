@@ -55,7 +55,11 @@ func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	}
 
 	if pData.Players != nil {
+		// start := time.Now()
 		items, err := db.InsertPlayers(*pData.Players)
+		// t := time.Now()
+		// elapsed := t.Sub(start)
+		// log.Println("time for db:", elapsed)
 		if err != nil {
 			log.Printf("error getting players: %v", err)
 		}

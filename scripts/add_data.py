@@ -2,6 +2,9 @@
 
 import urllib.request
 import json
+# import psycopg2
+# conn = psycopg2.connect(host='127.0.0.1', port=5432, user='postgres')
+# cur = conn.cursor()
 
 def chunks(l, n):
     for i in range(0, len(l), n):
@@ -29,7 +32,7 @@ myurl = "http://localhost:3003/method/players.add"
 
 with open('nogit/names.csv', 'r') as f:
     l = [{"name": line[:-1], "rating": 0.1} for line in f]
-    for chunk in chunks(l, 100):
+    for chunk in chunks(l, 1000):
         data = {'v': 2.1, 'players': chunk}
         req = urllib.request.Request(myurl)
         req.add_header('Content-Type', 'application/json; charset=utf-8')
@@ -39,6 +42,12 @@ with open('nogit/names.csv', 'r') as f:
         # print (jsondataasbytes)
         response = urllib.request.urlopen(req, jsondataasbytes)
         # print (response.read())
+        # break
+
+        # sql_names = ["INSERT INTO players(name) VALUES ('{}')".format(x['name']) for x in chunk]
+        # for sql in sql_names:
+        #     cur.execute(sql)
+        # conn.commit()
         # break
 
 # myurl = "http://localhost:3003/method/players.add"
