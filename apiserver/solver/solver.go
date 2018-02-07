@@ -23,6 +23,14 @@ func SolveMethod(method string, data apiobjects.BaseRequest) apiobjects.IRespons
 		return playersUpdate(&data)
 	case "players.getById":
 		return playersGetByID(&data)
+	case "teams.get":
+		return teamsGet(&data)
+	case "teams.add":
+		return teamsAdd(&data)
+	case "teams.update":
+		return teamsUpdate(&data)
+	case "teams.getById":
+		return teamsGetByID(&data)
 	}
 
 	eText := "unknown method"

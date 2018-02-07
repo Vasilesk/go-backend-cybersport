@@ -7,4 +7,5 @@ type BaseRequest struct {
 	Limit   *uint64   `json:"limit"`
 	Offset  *uint64   `json:"offset"`
 	Players *[]Player `json:"players"`
+	Teams   *[]Team   `json:"teams"`
 }

@@ -19,7 +19,7 @@ def request_json(data, url):
     response = urllib.request.urlopen(req, jsondataasbytes)
     return json.loads(response.read())
 
-
+baseurl = 'http://localhost:3003/method/{}.{}'
 geturl = "http://localhost:3003/method/players.get"
 addurl = "http://localhost:3003/method/players.add"
 updateurl = "http://localhost:3003/method/players.update"
@@ -27,47 +27,53 @@ getbyidurl = "http://localhost:3003/method/players.getById"
 
 if __name__ == '__main__':
     passed = True
-# players.add
 
-    body = {"token":"abc", "v": 2.1, "players": [{"name": "Added1", "description": "Desk1"}, {"name": "Added2", "description": "Desk2"}]}
-    resp = request_json(body, addurl)
+    for ent in ['player', 'team']:
+        ents = ent + 's'
+        # ents.add
+        method = 'add'
+        body = {"token":"abc", "v": 2.1, ents: [{"name": "Added1", "description": "Desk1"}, {"name": "Added2", "description": "Desk2"}]}
+        resp = request_json(body, baseurl.format(ents, method))
 
-    passed &= resp['status'] == 'ok'
+        passed &= resp['status'] == 'ok'
 
-    added_ids = resp['data']['items']
+        added_ids = resp['data']['items']
 
-    passed &= len(added_ids) == 2
+        passed &= len(added_ids) == 2
 
-# players.get
-    body = {"token":"abc", "v": 1.0, "offset": added_ids[0] - 1, "limit": 2}
-    resp = request_json(body, geturl)
+        # ents.get
+        method = 'get'
+        body = {"token":"abc", "v": 1.0, "offset": added_ids[0] - 1, "limit": 2}
+        resp = request_json(body, baseurl.format(ents, method))
 
-    passed &= resp['status'] == 'ok'
+        passed &= resp['status'] == 'ok'
 
-    items = resp['data']['items']
+        items = resp['data']['items']
 
-    passed &= items[0]['name'] == 'Added1'
-    passed &= items[1]['name'] == 'Added2'
+        passed &= items[0]['name'] == 'Added1'
+        passed &= items[1]['name'] == 'Added2'
 
-    ids_got = [x['id'] for x in items]
+        ids_got = [x['id'] for x in items]
 
-    passed &= added_ids == ids_got
+        passed &= added_ids == ids_got
 
-# players.update
-    body = {"token":"abc", "v": 1.0, "players": [{"id": added_ids[0], "name": "Updated1"}, {"id": added_ids[1], "name": "Updated2"}]}
-    resp = request_json(body, updateurl)
+        # ents.update
+        method = 'update'
+        body = {"token":"abc", "v": 1.0, ents: [{"id": added_ids[0], "name": "Updated1"}, {"id": added_ids[1], "name": "Updated2"}]}
+        resp = request_json(body, baseurl.format(ents, method))
 
-    passed &= resp['status'] == 'ok'
+        passed &= resp['status'] == 'ok'
 
-    updated_ids = resp['data']['updated_ids']
-    passed &= added_ids == updated_ids
+        updated_ids = resp['data']['updated_ids']
+        passed &= added_ids == updated_ids
 
-# players.getById
-    body = {"token":"abc", "v": 1.0, "id": updated_ids[0]}
-    resp = request_json(body, getbyidurl)
+        # ents.getById
+        method = 'getById'
+        body = {"token":"abc", "v": 1.0, "id": updated_ids[0]}
+        resp = request_json(body, baseurl.format(ents, method))
 
-    passed &= resp['status'] == 'ok'
-    passed &= resp['data']['player']['id'] == updated_ids[0]
+        passed &= resp['status'] == 'ok'
+        passed &= resp['data'][ent]['id'] == updated_ids[0]
 
     # print(resp)
 
