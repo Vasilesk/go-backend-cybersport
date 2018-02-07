@@ -7,29 +7,6 @@ import (
 	"github.com/Vasilesk/go-backend-cybersport/db"
 )
 
-// SolveMethod processes data that server gets
-func SolveMethod(method string, data apiobjects.BaseRequest) apiobjects.IResponse {
-	if data.V == nil {
-		log.Printf("error getting `v`: nil val\n")
-		errorDesc := "no api version"
-		return apiobjects.ErrorResponse{Error: &errorDesc}
-	}
-
-	switch method {
-	case "players.get":
-		return playersGet(&data)
-	case "players.add":
-		return playersAdd(&data)
-	case "players.update":
-		return playersUpdate(&data)
-	case "players.getById":
-		return playersGetByID(&data)
-	}
-
-	eText := "unknown method"
-	return apiobjects.ErrorResponse{Error: &eText}
-}
-
 func playersGetByID(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
 	res := apiobjects.BaseResponse{Data: &resData}
@@ -125,8 +102,4 @@ func playersUpdate(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	}
 
 	return res
-}
-
-func init() {
-
 }
