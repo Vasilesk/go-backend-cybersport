@@ -15,8 +15,11 @@ func SolveMethod(method string, data apiobjects.BaseRequest) apiobjects.IRespons
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 
-	if method == "players.get" {
+	switch method {
+	case "players.get":
 		return playersGet(&data)
+	case "players.add":
+		return playersAdd(&data)
 	}
 
 	eText := "unknown method"
@@ -27,14 +30,32 @@ func playersGet(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
 	resData["name"] = "vasya"
 	resData["count"] = 100500
-	resData["items"] = make([]string, 0, 10)
 	res := apiobjects.BaseResponse{Data: &resData}
 
-	items, err := db.GetPlayers()
+	// offset, limit
+	items, err := db.SelectPlayers(100, 50)
 	if err != nil {
 		log.Printf("error getting players: %v", err)
 	}
 	resData["items"] = items
+
+	return res
+}
+
+func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+	resData := make(map[string]interface{})
+	resData["name"] = "kolya"
+	resData["count"] = 100501
+	// resData["items"] = make([]string, 0, 10)
+	res := apiobjects.BaseResponse{Data: &resData}
+
+	if pData.Players != nil {
+		items, err := db.InsertPlayers(*pData.Players)
+		if err != nil {
+			log.Printf("error getting players: %v", err)
+		}
+		resData["items"] = items
+	}
 
 	return res
 }

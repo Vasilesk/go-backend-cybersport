@@ -9,9 +9,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	// don`t understand why we need this import
-	// but nothing works without it
-	"github.com/Vasilesk/go-backend-cybersport/apiserver/apiobjects"
+	// making postgres work
 	_ "github.com/lib/pq"
 )
 
@@ -44,44 +42,6 @@ func getConf() conf {
 	}
 
 	return c
-}
-
-// GetPlayers gets players from db
-func GetPlayers() ([]apiobjects.Player, error) {
-	var result [maxItems]apiobjects.Player
-	// db := getDbConn()
-	rows, err := db.Query("SELECT id, name, description, logo_link, rating FROM players;")
-	if err != nil {
-		logErr(err)
-		return nil, errors.New("DB error")
-	}
-
-	// got := []row{}
-	i := 0
-	for rows.Next() {
-		log.Printf("here\n")
-		var p apiobjects.Player
-		err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.LogoLink, &p.Rating)
-		if err != nil {
-			log.Printf("error scanning db result: %v\n", err)
-		}
-		result[i] = p
-		i++
-		// result = append(result, p)
-	}
-
-	// var player *apiobjects.Player
-	// for rows.Next() {
-	// 	err = rows.Scan(&username, &message)
-	// 	if err != nil {
-	// 		logErr(err)
-	// 		return result, errors.New("Backend error")
-	// 	}
-	// 	result[i] = username + ": " + message
-	// 	i++
-	// }
-
-	return result[0:i], nil
 }
 
 // old below
