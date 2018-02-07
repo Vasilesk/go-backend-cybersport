@@ -85,8 +85,12 @@ func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 
 func playersUpdate(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
-	// resData["count"] = 100502
 	res := apiobjects.BaseResponse{Data: &resData}
+
+	if pData.Players == nil {
+		errorDesc := "no player sent"
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
 
 	if len(*pData.Players) > db.MaxItems {
 		errorDesc := "too many players to update"
