@@ -12,7 +12,7 @@ import (
 
 // SelectPlayers gets players from db
 func SelectPlayers(offset uint64, limit uint64) ([]apiobjects.Player, error) {
-	var result [maxItems]apiobjects.Player
+	var result [MaxItems]apiobjects.Player
 	rows, err := db.Query("SELECT id, name, description, logo_link, rating FROM players LIMIT $1 OFFSET $2;", limit, offset)
 	if err != nil {
 		logErr(err)
@@ -48,7 +48,7 @@ func SelectPlayers(offset uint64, limit uint64) ([]apiobjects.Player, error) {
 
 // InsertPlayers gets players from db
 func InsertPlayers(players []apiobjects.Player) ([]uint64, error) {
-	var result [maxItems]uint64
+	var result [MaxItems]uint64
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("error starting tx: %v\n", err)

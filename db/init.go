@@ -13,7 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const maxItems = 100
+const MaxItems = 100
 
 var db *sql.DB
 
@@ -77,11 +77,11 @@ func GetUserByKey(key string) (int, string) {
 }
 
 // GetHistory returns message history
-func GetHistory() ([maxItems]string, error) {
-	var result [maxItems]string
+func GetHistory() ([MaxItems]string, error) {
+	var result [MaxItems]string
 	// db := getDbConn()
 	rows, err := db.Query("SELECT login, message FROM history inner join users on users.id = user_id ORDER BY history.id LIMIT $1;",
-		maxItems)
+		MaxItems)
 	if err != nil {
 		logErr(err)
 		return result, errors.New("DB error")

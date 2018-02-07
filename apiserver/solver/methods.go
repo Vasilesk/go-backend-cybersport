@@ -49,6 +49,11 @@ func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	// resData["items"] = make([]string, 0, 10)
 	res := apiobjects.BaseResponse{Data: &resData}
 
+	if len(*pData.Players) > db.MaxItems {
+		errorDesc := "too many players to add"
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
+
 	if pData.Players != nil {
 		items, err := db.InsertPlayers(*pData.Players)
 		if err != nil {
