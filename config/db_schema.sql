@@ -18,8 +18,8 @@ CREATE TABLE teams (
     name text,
     description text,
     logo_link text,
-    game_id integer REFERENCES games (id) ON DELETE CASCADE,
-    rating real
+    rating real,
+    game_id integer REFERENCES games (id) ON DELETE CASCADE
 );
 
 CREATE TABLE teams_players (

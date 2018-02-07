@@ -21,7 +21,6 @@ func SelectPlayers(offset uint64, limit uint64) ([]apiobjects.Player, error) {
 
 	i := 0
 	for rows.Next() {
-		log.Printf("here\n")
 		var p apiobjects.Player
 		err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.LogoLink, &p.Rating)
 		if err != nil {

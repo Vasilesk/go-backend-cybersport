@@ -12,7 +12,7 @@ func teamsGetByID(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	res := apiobjects.BaseResponse{Data: &resData}
 
 	if pData.ID == nil {
-		errorDesc := "id is not set"
+		errorDesc := errNoID
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 

@@ -13,6 +13,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// MaxItems is a const restricting count of items to get, add, update, delete
 const MaxItems = 1000
 
 var db *sql.DB

@@ -28,7 +28,7 @@ getbyidurl = "http://localhost:3003/method/players.getById"
 if __name__ == '__main__':
     passed = True
 
-    for ent in ['player', 'team']:
+    for ent in ['player', 'team', 'tournament']:
         ents = ent + 's'
         # ents.add
         method = 'add'

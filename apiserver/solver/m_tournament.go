@@ -7,7 +7,7 @@ import (
 	"github.com/Vasilesk/go-backend-cybersport/db"
 )
 
-func playersGetByID(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+func tournamentsGetByID(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
 	res := apiobjects.BaseResponse{Data: &resData}
 
@@ -16,18 +16,18 @@ func playersGetByID(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 
-	playerID := *pData.ID
+	tournamentID := *pData.ID
 	var err error
-	resData["player"], err = db.SelectPlayerByID(playerID)
+	resData["tournament"], err = db.SelectTournamentByID(tournamentID)
 	if err != nil {
-		log.Printf("error getting player by id: %v", err)
-		errorDesc := "error getting player by id"
+		log.Printf("error getting tournament by id: %v", err)
+		errorDesc := "error getting tournament by id"
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 	return res
 }
 
-func playersGet(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+func tournamentsGet(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
 	// resData["count"] = 100500
 	res := apiobjects.BaseResponse{Data: &resData}
@@ -44,38 +44,38 @@ func playersGet(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	} else {
 		limit = *pData.Limit
 	}
-	items, err := db.SelectPlayers(offset, limit)
+	items, err := db.SelectTournaments(offset, limit)
 	if err != nil {
-		log.Printf("error getting players: %v", err)
+		log.Printf("error getting tournaments: %v", err)
 	}
 	resData["items"] = items
 
 	return res
 }
 
-func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+func tournamentsAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
 	// resData["count"] = 100501
 	res := apiobjects.BaseResponse{Data: &resData}
 
-	if pData.Players == nil {
-		errorDesc := "no player sent"
+	if pData.Tournaments == nil {
+		errorDesc := "no tournament sent"
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 
-	if len(*pData.Players) > db.MaxItems {
-		errorDesc := "too many players to add"
+	if len(*pData.Tournaments) > db.MaxItems {
+		errorDesc := "too many tournaments to add"
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 
-	if pData.Players != nil {
+	if pData.Tournaments != nil {
 		// start := time.Now()
-		items, err := db.InsertPlayers(*pData.Players)
+		items, err := db.InsertTournaments(*pData.Tournaments)
 		// t := time.Now()
 		// elapsed := t.Sub(start)
 		// log.Println("time for db:", elapsed)
 		if err != nil {
-			log.Printf("error adding players: %v", err)
+			log.Printf("error adding tournaments: %v", err)
 		}
 		resData["items"] = items
 	}
@@ -83,24 +83,24 @@ func playersAdd(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	return res
 }
 
-func playersUpdate(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+func tournamentsUpdate(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 	resData := make(map[string]interface{})
 	res := apiobjects.BaseResponse{Data: &resData}
 
-	if pData.Players == nil {
-		errorDesc := "no player sent"
+	if pData.Tournaments == nil {
+		errorDesc := "no tournament sent"
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 
-	if len(*pData.Players) > db.MaxItems {
-		errorDesc := "too many players to update"
+	if len(*pData.Tournaments) > db.MaxItems {
+		errorDesc := "too many tournaments to update"
 		return apiobjects.ErrorResponse{Error: &errorDesc}
 	}
 
-	if pData.Players != nil {
-		items, err := db.UpdatePlayers(*pData.Players)
+	if pData.Tournaments != nil {
+		items, err := db.UpdateTournaments(*pData.Tournaments)
 		if err != nil {
-			log.Printf("error updating players: %v", err)
+			log.Printf("error updating tournaments: %v", err)
 		}
 		resData["updated_ids"] = items
 	}

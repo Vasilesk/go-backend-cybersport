@@ -7,4 +7,5 @@ type Team struct {
 	Description *string  `json:"description"`
 	LogoLink    *string  `json:"logo_link"`
 	Rating      *float64 `json:"rating"`
+	GameID      *uint64  `json:"game_id"`
 }
