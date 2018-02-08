@@ -58,7 +58,6 @@ func InsertTeams(teams []apiobjects.Team) ([]uint64, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("error starting tx: %v\n", err)
-		tx.Rollback()
 		return nil, err
 	}
 
@@ -91,7 +90,6 @@ func UpdateTeams(teams []apiobjects.Team) ([]uint64, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("error starting tx: %v\n", err)
-		tx.Rollback()
 		return nil, err
 	}
 
