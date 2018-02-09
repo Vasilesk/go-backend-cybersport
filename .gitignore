@@ -1,4 +1,5 @@
 nogit/
+config/db.yaml
 
 # Binaries for programs and plugins
 *.exe
