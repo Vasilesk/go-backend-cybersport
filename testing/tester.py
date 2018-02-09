@@ -75,6 +75,8 @@ if __name__ == '__main__':
         passed &= resp['status'] == 'ok'
         passed &= resp['data'][ent]['id'] == updated_ids[0]
 
+        print('ids processed {}'.format(ids_got))
+
     # print(resp)
 
     # # one by one
@@ -126,6 +128,7 @@ if __name__ == '__main__':
     # response = urllib.request.urlopen(req, jsondataasbytes)
     # # print (response)
     # print (response.read())
+
     if passed:
         print('PASSED')
     else:

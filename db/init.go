@@ -22,6 +22,8 @@ type conf struct {
 	User     string `yaml:"user"`
 	Database string `yaml:"database"`
 	Password string `yaml:"password"`
+	Port     string `yaml:"port"`
+	Host     string `yaml:"host"`
 }
 
 // old
@@ -113,11 +115,11 @@ func AddMessage(userID int, message []byte) error {
 }
 
 func getDbConn() (*sql.DB, error) {
-	// c := getConf()
-	// dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable port=5432 host=vasilesk.ru",
-	// 	c.User, c.Password, c.Database)
-	dbinfo := fmt.Sprintf("sslmode=disable user=%s port=%s host=%s",
-		"postgres", "5432", "localhost")
+	c := getConf()
+	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable port=%s host=%s",
+		c.User, c.Password, c.Database, c.Port, c.Host)
+	// dbinfo := fmt.Sprintf("sslmode=disable user=%s port=%s host=%s",
+	// 	"postgres", "5432", "localhost")
 	conn, err := sql.Open("postgres", dbinfo)
 
 	if err != nil {
