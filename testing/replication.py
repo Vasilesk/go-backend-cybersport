@@ -2,17 +2,15 @@
 
 import urllib.request
 import json
-# import psycopg2
-# conn = psycopg2.connect(host='127.0.0.1', port=5432, user='postgres')
-# cur = conn.cursor()
+from tester import chunks, request_json, baseurl
 
-def chunks(l, n):
-    for i in range(0, len(l), n):
-        yield l[i:i+n]
-
-
-addurl = "http://localhost:3003/method/players.add"
-updateurl = "http://localhost:3003/method/players.update"
+if __name__ == '__main__':
+    # body = {"token":"abc", "v": 2.1, "players": [{"name": "Added1", "description": "Desk1"}, {"name": "Added2", "description": "Desk2"}]}
+    # resp = request_json(body, baseurl.format('players', 'add'))
+    body = {"token":"abc", "v": 1.0, "offset": 0, "limit": 200}
+    resp = request_json(body, baseurl.format('players', 'get'))
+    print(resp)
+    print(len(resp['data']['items']))
 
 # # one by one
 # with open('nogit/names.csv', 'r') as f:
@@ -49,16 +47,4 @@ updateurl = "http://localhost:3003/method/players.update"
 #         # for sql in sql_names:
 #         #     cur.execute(sql)
 #         # conn.commit()
-#         # break\
-#
-url = updateurl
-body = {"token":"abc", "v": 2.1, "players": [{"id": 1, "name": "Sasha"}, {"id": 2, "name": "Sasha2"}]}
-req = urllib.request.Request(url)
-req.add_header('Content-Type', 'application/json; charset=utf-8')
-jsondata = json.dumps(body)
-jsondataasbytes = jsondata.encode('utf-8')   # needs to be bytes
-req.add_header('Content-Length', len(jsondataasbytes))
-# print (jsondataasbytes)
-response = urllib.request.urlopen(req, jsondataasbytes)
-# print (response)
-print (response.read())
+#         # break

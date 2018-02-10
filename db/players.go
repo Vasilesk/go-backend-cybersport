@@ -16,7 +16,16 @@ func SelectPlayers(offset uint64, limit uint64) ([]apiobjects.Player, error) {
 	rows, err := db.Query("SELECT id, name, description, logo_link, rating FROM players ORDER BY id LIMIT $1 OFFSET $2;", limit, offset)
 	if err != nil {
 		logErr(err)
-		return nil, errors.New("DB error")
+		err = rescueDb()
+		if err != nil {
+			logErr(err)
+			return nil, errors.New("DB error")
+		}
+
+		rows, err = db.Query("SELECT id, name, description, logo_link, rating FROM players ORDER BY id LIMIT $1 OFFSET $2;", limit, offset)
+		if err != nil {
+			return nil, errors.New("DB error")
+		}
 	}
 
 	i := 0
@@ -59,6 +68,10 @@ func SelectPlayerByID(playerID uint64) (apiobjects.Player, error) {
 	default:
 		{
 			log.Printf("error while getting row: %v\n", err)
+			err2 := rescueDb()
+			if err2 != nil {
+				logErr(err2)
+			}
 			return result, err
 		}
 	}
@@ -70,6 +83,10 @@ func InsertPlayers(players []apiobjects.Player) ([]uint64, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("error starting tx: %v\n", err)
+		err2 := rescueDb()
+		if err2 != nil {
+			logErr(err2)
+		}
 		return nil, err
 	}
 
@@ -102,6 +119,10 @@ func UpdatePlayers(players []apiobjects.Player) ([]uint64, error) {
 	tx, err := db.Begin()
 	if err != nil {
 		log.Printf("error starting tx: %v\n", err)
+		err2 := rescueDb()
+		if err2 != nil {
+			logErr(err2)
+		}
 		return nil, err
 	}
 

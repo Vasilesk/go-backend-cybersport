@@ -17,6 +17,7 @@ import (
 const MaxItems = 1000
 
 var db *sql.DB
+var rdb *sql.DB
 
 type conf struct {
 	User     string `yaml:"user"`
@@ -53,7 +54,6 @@ func getConf() conf {
 
 // CreateKey creates key for user by his id
 func CreateKey(userID int) string {
-	// db := getDbConn()
 	db.QueryRow("INSERT INTO access_keys(user_id,key) VALUES($1,$2);", userID, "s")
 
 	return "s"
@@ -61,7 +61,6 @@ func CreateKey(userID int) string {
 
 // GetUserByKey returns user login by key or "" if no user with the key exists
 func GetUserByKey(key string) (int, string) {
-	// db := getDbConn()
 	rows, err := db.Query("SELECT user_id, login FROM access_keys JOIN users ON user_id=id WHERE key=$1 LIMIT 1;", key)
 	if err != nil {
 		logErr(err)
@@ -84,7 +83,6 @@ func GetUserByKey(key string) (int, string) {
 // GetHistory returns message history
 func GetHistory() ([MaxItems]string, error) {
 	var result [MaxItems]string
-	// db := getDbConn()
 	rows, err := db.Query("SELECT login, message FROM history inner join users on users.id = user_id ORDER BY history.id LIMIT $1;",
 		MaxItems)
 	if err != nil {
@@ -110,30 +108,59 @@ func GetHistory() ([MaxItems]string, error) {
 
 // AddMessage stores message into DB
 func AddMessage(userID int, message []byte) error {
-	// db := getDbConn()
 	db.QueryRow("INSERT INTO history(user_id, message) VALUES($1, $2);", userID, message)
 
 	return nil
 }
 
-func getDbConn(c conf) (*sql.DB, error) {
-	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable port=%s host=%s",
-		c.User, c.Password, c.Database, c.Port, c.Host)
+func getDbConns(c conf) (*sql.DB, *sql.DB, error) {
+	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%s",
+		c.User, c.Password, c.Database, c.Host, c.Port)
 	// dbinfo := fmt.Sprintf("sslmode=disable user=%s port=%s host=%s",
 	// 	"postgres", "5432", "localhost")
 	conn, err := sql.Open("postgres", dbinfo)
 
 	if err != nil {
-		return nil, errors.New("db was not connected")
+		return nil, nil, errors.New("db was not connected")
 	}
 
-	return conn, nil
+	rDbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable host=%s port=%s",
+		c.User, c.Password, c.Database, c.RHost, c.RPort)
+	rConn, err := sql.Open("postgres", rDbinfo)
+
+	if err != nil {
+		log.Printf("reserve db was not connected, but the main one is ok")
+		rConn = nil
+	}
+
+	return conn, rConn, nil
+}
+
+func rescueDb() error {
+	err := db.Ping()
+	if err != nil {
+		if rdb != nil {
+			err := rdb.Ping()
+			if err != nil {
+				return errors.New("db was not rescued")
+			}
+			// TODO: change status of rdb to rw
+			buf := db
+			db = rdb
+			rdb = buf
+			return nil
+		}
+
+		return errors.New("no reserve db to reestablish the connection")
+	}
+
+	return nil
 }
 
 func init() {
 	var err error
 	c := getConf()
-	db, err = getDbConn(c)
+	db, rdb, err = getDbConns(c)
 	if err != nil {
 		panic(err)
 	}
