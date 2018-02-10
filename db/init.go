@@ -22,8 +22,10 @@ type conf struct {
 	User     string `yaml:"user"`
 	Database string `yaml:"database"`
 	Password string `yaml:"password"`
-	Port     string `yaml:"port"`
 	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	RHost    string `yaml:"r_host"`
+	RPort    string `yaml:"r_port"`
 }
 
 // old
@@ -114,8 +116,7 @@ func AddMessage(userID int, message []byte) error {
 	return nil
 }
 
-func getDbConn() (*sql.DB, error) {
-	c := getConf()
+func getDbConn(c conf) (*sql.DB, error) {
 	dbinfo := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable port=%s host=%s",
 		c.User, c.Password, c.Database, c.Port, c.Host)
 	// dbinfo := fmt.Sprintf("sslmode=disable user=%s port=%s host=%s",
@@ -131,7 +132,8 @@ func getDbConn() (*sql.DB, error) {
 
 func init() {
 	var err error
-	db, err = getDbConn()
+	c := getConf()
+	db, err = getDbConn(c)
 	if err != nil {
 		panic(err)
 	}
