@@ -12,6 +12,8 @@ if __name__ == '__main__':
     print(resp)
     print(len(resp['data']['items']))
 
+    # resp = request_json({'key': 'mysecretkey'}, 'http://localhost:8080')
+    # print(resp)
 # # one by one
 # with open('nogit/names.csv', 'r') as f:
 #     for line in f:
