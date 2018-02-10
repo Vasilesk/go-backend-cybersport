@@ -19,11 +19,12 @@ def request_json(data, url):
     response = urllib.request.urlopen(req, jsondataasbytes)
     return json.loads(response.read())
 
-baseurl = 'http://localhost:3003/method/{}.{}'
-geturl = "http://localhost:3003/method/players.get"
-addurl = "http://localhost:3003/method/players.add"
-updateurl = "http://localhost:3003/method/players.update"
-getbyidurl = "http://localhost:3003/method/players.getById"
+local_port = 3003
+local_port = 9998
+baseurl = 'http://localhost:{}'.format(local_port)+ '/method/{}.{}'
+
+with open('config/m_data.json', 'r') as f:
+    m_data = json.load(f)
 
 if __name__ == '__main__':
     passed = True

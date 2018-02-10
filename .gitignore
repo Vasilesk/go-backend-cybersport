@@ -1,5 +1,6 @@
 nogit/
 config/db.yaml
+config/m_data.json
 
 # Binaries for programs and plugins
 *.exe
