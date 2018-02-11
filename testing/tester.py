@@ -22,7 +22,7 @@ def request_json(data, url):
 local_port = 3003
 local_port = 9998
 baseurl = 'http://localhost:{}'.format(local_port)+ '/method/{}.{}'
-baseurl = 'http://cyber.vasilesk.ru/method/{}.{}'
+baseurl = 'https://cyber.vasilesk.ru/method/{}.{}'
 
 with open('config/m_data.json', 'r') as f:
     m_data = json.load(f)
