@@ -62,17 +62,27 @@ func SelectPlayerByID(playerID uint64) (apiobjects.Player, error) {
 	switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating); err {
 	case sql.ErrNoRows:
 		log.Printf("error scanning db result: %v\n", err)
-		return result, nil
-	case nil:
 		return result, err
+	case nil:
+		return result, nil
 	default:
 		{
 			log.Printf("error while getting row: %v\n", err)
 			err2 := rescueDb()
 			if err2 != nil {
 				logErr(err2)
+				return result, err
 			}
-			return result, err
+			row := db.QueryRow("SELECT id, name, description, logo_link, rating FROM players WHERE id = $1;", playerID)
+			switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating); err {
+			case sql.ErrNoRows:
+				log.Printf("error scanning db result: %v\n", err)
+				return result, err
+			case nil:
+				return result, nil
+			default:
+				return result, err
+			}
 		}
 	}
 }
@@ -86,8 +96,14 @@ func InsertPlayers(players []apiobjects.Player) ([]uint64, error) {
 		err2 := rescueDb()
 		if err2 != nil {
 			logErr(err2)
+			return nil, err
 		}
-		return nil, err
+		// time.Sleep(3 * time.Second)
+		tx, err2 = db.Begin()
+		if err2 != nil {
+			logErr(err2)
+			return nil, err
+		}
 	}
 
 	// stmt, err := tx.Prepare(query)
@@ -105,10 +121,7 @@ func InsertPlayers(players []apiobjects.Player) ([]uint64, error) {
 		default:
 			log.Printf("error while inserting row: %v\n", err)
 			tx.Rollback()
-			err2 := rescueDb()
-			if err2 != nil {
-				logErr(err2)
-			}
+
 			return nil, err
 		}
 
@@ -126,11 +139,16 @@ func UpdatePlayers(players []apiobjects.Player) ([]uint64, error) {
 		err2 := rescueDb()
 		if err2 != nil {
 			logErr(err2)
+			return nil, err
 		}
-		return nil, err
+		// time.Sleep(3 * time.Second)
+		tx, err2 = db.Begin()
+		if err2 != nil {
+			logErr(err2)
+			return nil, err
+		}
 	}
 
-	// stmt, err := tx.Prepare(query)
 	lenPlayers := 0
 	var updatedID uint64
 	for i, player := range players {

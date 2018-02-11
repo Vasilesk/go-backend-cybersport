@@ -5,12 +5,24 @@ import json
 from tester import chunks, request_json, baseurl
 
 if __name__ == '__main__':
+    # # add
     # body = {"token":"abc", "v": 2.1, "players": [{"name": "Added1", "description": "Desk1"}, {"name": "Added2", "description": "Desk2"}]}
     # resp = request_json(body, baseurl.format('players', 'add'))
-    body = {"token":"abc", "v": 1.0, "offset": 0, "limit": 200}
-    resp = request_json(body, baseurl.format('players', 'get'))
+
+    # # get
+    # body = {"token":"abc", "v": 1.0, "offset": 0, "limit": 200}
+    # resp = request_json(body, baseurl.format('players', 'get'))
+
+    # # update
+    # body = {"token":"abc", "v": 1.0, "players": [{"id": 1, "name": "Updated1"}, {"id": 2, "name": "Updated2"}]}
+    # resp = request_json(body, baseurl.format('players', 'update'))
+
+    # getById
+    body = {"token":"abc", "v": 1.0, "id": 1}
+    resp = request_json(body, baseurl.format('players', 'getById'))
+
     print(resp)
-    print(len(resp['data']['items']))
+    # print(len(resp['data']['items']))
 
     # resp = request_json({'key': 'mysecretkey'}, 'http://localhost:8080')
     # print(resp)
