@@ -13,7 +13,8 @@ import (
 // SelectPlayers gets players from db
 func SelectPlayers(offset uint64, limit uint64) ([]apiobjects.Player, error) {
 	var result [MaxItems]apiobjects.Player
-	rows, err := db.Query("SELECT id, name, description, logo_link, rating FROM players ORDER BY id LIMIT $1 OFFSET $2;", limit, offset)
+	queryStr := "SELECT id, name, description, logo_link, rating FROM players ORDER BY id LIMIT $1 OFFSET $2;"
+	rows, err := db.Query(queryStr, limit, offset)
 	if err != nil {
 		logErr(err)
 		err = rescueDb()
@@ -22,7 +23,7 @@ func SelectPlayers(offset uint64, limit uint64) ([]apiobjects.Player, error) {
 			return nil, errors.New("DB error")
 		}
 
-		rows, err = db.Query("SELECT id, name, description, logo_link, rating FROM players ORDER BY id LIMIT $1 OFFSET $2;", limit, offset)
+		rows, err = db.Query(queryStr, limit, offset)
 		if err != nil {
 			return nil, errors.New("DB error")
 		}
@@ -57,7 +58,8 @@ func SelectPlayers(offset uint64, limit uint64) ([]apiobjects.Player, error) {
 // SelectPlayerByID gets one player from db by id
 func SelectPlayerByID(playerID uint64) (apiobjects.Player, error) {
 	var result apiobjects.Player
-	row := db.QueryRow("SELECT id, name, description, logo_link, rating FROM players WHERE id = $1;", playerID)
+	queryStr := "SELECT id, name, description, logo_link, rating FROM players WHERE id = $1;"
+	row := db.QueryRow(queryStr, playerID)
 
 	switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating); err {
 	case sql.ErrNoRows:
@@ -73,7 +75,7 @@ func SelectPlayerByID(playerID uint64) (apiobjects.Player, error) {
 				logErr(err2)
 				return result, err
 			}
-			row := db.QueryRow("SELECT id, name, description, logo_link, rating FROM players WHERE id = $1;", playerID)
+			row := db.QueryRow(queryStr, playerID)
 			switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating); err {
 			case sql.ErrNoRows:
 				log.Printf("error scanning db result: %v\n", err)
@@ -111,7 +113,7 @@ func InsertPlayers(players []apiobjects.Player) ([]uint64, error) {
 	var newID uint64
 	for i, player := range players {
 		lenPlayers++
-		row := tx.QueryRow("insert into players (name, description, logo_link, rating) values ($1, $2, $3, $4) returning ID;",
+		row := tx.QueryRow("INSERT INTO players (name, description, logo_link, rating) VALUES ($1, $2, $3, $4) RETURNING id;",
 			player.Name, player.Description, player.LogoLink, player.Rating)
 		switch err := row.Scan(&newID); err {
 		case sql.ErrNoRows:
@@ -158,7 +160,7 @@ func UpdatePlayers(players []apiobjects.Player) ([]uint64, error) {
 			tx.Rollback()
 			return nil, errors.New("no id for player")
 		}
-		row := tx.QueryRow("update players set (name, description, logo_link, rating) = ($1, $2, $3, $4) where id=$5 returning id;",
+		row := tx.QueryRow("UPDATE players SET (name, description, logo_link, rating) = ($1, $2, $3, $4) WHERE id=$5 RETURNING id;",
 			player.Name, player.Description, player.LogoLink, player.Rating, player.ID)
 		switch err := row.Scan(&updatedID); err {
 		case sql.ErrNoRows:
