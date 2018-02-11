@@ -105,6 +105,10 @@ func InsertPlayers(players []apiobjects.Player) ([]uint64, error) {
 		default:
 			log.Printf("error while inserting row: %v\n", err)
 			tx.Rollback()
+			err2 := rescueDb()
+			if err2 != nil {
+				logErr(err2)
+			}
 			return nil, err
 		}
 
