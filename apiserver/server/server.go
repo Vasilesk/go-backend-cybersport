@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -83,7 +84,7 @@ func methodsHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Printf("error handling request: %v ", err)
-		// http.Error(w, fmt.Sprintf("error: %s!\n", err), 500)
+		http.Error(w, fmt.Sprintf("error: %s!\n", err), 500)
 	}
 
 	t := time.Now()
