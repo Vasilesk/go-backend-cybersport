@@ -1,11 +1,14 @@
 package db
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 
 	yaml "gopkg.in/yaml.v2"
 
@@ -19,6 +22,9 @@ const MaxItems = 1000
 var db *sql.DB
 var rdb *sql.DB
 
+var rHost string
+var rPort string
+
 type conf struct {
 	User     string `yaml:"user"`
 	Database string `yaml:"database"`
@@ -27,6 +33,10 @@ type conf struct {
 	Port     string `yaml:"port"`
 	RHost    string `yaml:"r_host"`
 	RPort    string `yaml:"r_port"`
+}
+
+type masterRequest struct {
+	Key string `json:"key"`
 }
 
 // old
@@ -129,7 +139,7 @@ func getDbConns(c conf) (*sql.DB, *sql.DB, error) {
 	rConn, err := sql.Open("postgres", rDbinfo)
 
 	if err != nil {
-		log.Printf("reserve db was not connected, but the main one is ok")
+		log.Printf("reserve db was not connected, but the main one is ok\n")
 		rConn = nil
 	}
 
@@ -144,7 +154,10 @@ func rescueDb() error {
 			if err != nil {
 				return errors.New("db was not rescued")
 			}
-			// TODO: change status of rdb to rw
+			err = rToMaster()
+			if err != nil {
+				log.Printf("reserve db was will be connected in readonly mode: %v\n", err)
+			}
 			buf := db
 			db = rdb
 			rdb = buf
@@ -157,9 +170,22 @@ func rescueDb() error {
 	return nil
 }
 
+func rToMaster() error {
+	data := masterRequest{Key: "mysecretkey"}
+	bData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	bufData := bytes.NewReader(bData)
+	_, err = http.Post("http://"+rHost+":8080", "application/json; charset=utf-8", bufData)
+	return err
+}
+
 func init() {
 	var err error
 	c := getConf()
+	rHost = c.RHost
+
 	db, rdb, err = getDbConns(c)
 	if err != nil {
 		panic(err)
