@@ -152,6 +152,7 @@ func rescueDb() error {
 		if rdb != nil {
 			err := rdb.Ping()
 			if err != nil {
+				log.Printf("pinging rdb: %v\n", err)
 				return errors.New("db was not rescued")
 			}
 			err = rToMaster()
