@@ -38,19 +38,7 @@ func SelectTeams(offset uint64, limit uint64) ([]apiobjects.Team, error) {
 		}
 		result[i] = p
 		i++
-		// result = append(result, p)
 	}
-
-	// var team *apiobjects.Team
-	// for rows.Next() {
-	// 	err = rows.Scan(&username, &message)
-	// 	if err != nil {
-	// 		logErr(err)
-	// 		return result, errors.New("Backend error")
-	// 	}
-	// 	result[i] = username + ": " + message
-	// 	i++
-	// }
 
 	return result[0:i], nil
 }
@@ -100,7 +88,6 @@ func InsertTeams(teams []apiobjects.Team) ([]uint64, error) {
 			logErr(err2)
 			return nil, err
 		}
-		// time.Sleep(3 * time.Second)
 		tx, err2 = db.Begin()
 		if err2 != nil {
 			logErr(err2)
@@ -108,7 +95,6 @@ func InsertTeams(teams []apiobjects.Team) ([]uint64, error) {
 		}
 	}
 
-	// stmt, err := tx.Prepare(query)
 	lenTeams := 0
 	var newID uint64
 	for i, team := range teams {
@@ -143,7 +129,6 @@ func UpdateTeams(teams []apiobjects.Team) ([]uint64, error) {
 			logErr(err2)
 			return nil, err
 		}
-		// time.Sleep(3 * time.Second)
 		tx, err2 = db.Begin()
 		if err2 != nil {
 			logErr(err2)
