@@ -23,7 +23,6 @@ var db *sql.DB
 var rdb *sql.DB
 
 var rHost string
-var rPort string
 
 type conf struct {
 	User     string `yaml:"user"`
@@ -157,7 +156,7 @@ func rescueDb() error {
 			}
 			err = rToMaster()
 			if err != nil {
-				log.Printf("reserve db was will be connected in readonly mode: %v\n", err)
+				log.Printf("reserve db will be connected in readonly mode: %v\n", err)
 			}
 			buf := db
 			db = rdb
