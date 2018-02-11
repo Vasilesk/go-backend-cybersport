@@ -32,7 +32,7 @@ func SelectTeams(offset uint64, limit uint64) ([]apiobjects.Team, error) {
 	i := 0
 	for rows.Next() {
 		var p apiobjects.Team
-		err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.LogoLink, &p.Rating)
+		err = rows.Scan(&p.ID, &p.Name, &p.Description, &p.LogoLink, &p.Rating, &p.GameID)
 		if err != nil {
 			log.Printf("error scanning db result: %v\n", err)
 		}
@@ -61,7 +61,7 @@ func SelectTeamByID(teamID uint64) (apiobjects.Team, error) {
 	queryStr := "SELECT id, name, description, logo_link, rating, game_id FROM teams WHERE id = $1;"
 	row := db.QueryRow(queryStr, teamID)
 
-	switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating); err {
+	switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating, &result.GameID); err {
 	case sql.ErrNoRows:
 		log.Printf("error scanning db result: %v\n", err)
 		return result, err
@@ -76,7 +76,7 @@ func SelectTeamByID(teamID uint64) (apiobjects.Team, error) {
 				return result, err
 			}
 			row := db.QueryRow(queryStr, teamID)
-			switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating); err {
+			switch err := row.Scan(&result.ID, &result.Name, &result.Description, &result.LogoLink, &result.Rating, &result.GameID); err {
 			case sql.ErrNoRows:
 				log.Printf("error scanning db result: %v\n", err)
 				return result, err
@@ -114,7 +114,7 @@ func InsertTeams(teams []apiobjects.Team) ([]uint64, error) {
 	for i, team := range teams {
 		lenTeams++
 		row := tx.QueryRow("INSERT INTO teams (name, description, logo_link, rating, game_id) VALUES ($1, $2, $3, $4, $5) RETURNING id;",
-			team.Name, team.Description, team.LogoLink, team.Rating)
+			team.Name, team.Description, team.LogoLink, team.Rating, team.GameID)
 		switch err := row.Scan(&newID); err {
 		case sql.ErrNoRows:
 			log.Printf("error scanning db result: %v\n", err)
@@ -161,7 +161,7 @@ func UpdateTeams(teams []apiobjects.Team) ([]uint64, error) {
 			return nil, errors.New("no id for team")
 		}
 		row := tx.QueryRow("UPDATE teams SET (name, description, logo_link, rating, game_id) = ($1, $2, $3, $4, $5) WHERE id=$6 RETURNING id;",
-			team.Name, team.Description, team.LogoLink, team.Rating, team.ID)
+			team.Name, team.Description, team.LogoLink, team.Rating, team.GameID, team.ID)
 		switch err := row.Scan(&updatedID); err {
 		case sql.ErrNoRows:
 			log.Printf("error scanning db result: %v\n", err)
