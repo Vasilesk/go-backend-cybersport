@@ -107,3 +107,23 @@ func playersUpdate(pData *apiobjects.BaseRequest) apiobjects.IResponse {
 
 	return res
 }
+
+func playersRemoveByID(pData *apiobjects.BaseRequest) apiobjects.IResponse {
+	resData := make(map[string]interface{})
+	res := apiobjects.BaseResponse{Data: &resData}
+
+	if pData.ID == nil {
+		errorDesc := errNoID
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
+
+	playerID := *pData.ID
+	var err error
+	resData["player"], err = db.DeleteByID(playerID)
+	if err != nil {
+		log.Printf("error getting player by id: %v", err)
+		errorDesc := "error removing player by id"
+		return apiobjects.ErrorResponse{Error: &errorDesc}
+	}
+	return res
+}

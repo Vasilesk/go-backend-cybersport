@@ -177,3 +177,36 @@ func UpdatePlayers(players []apiobjects.Player) ([]uint64, error) {
 	tx.Commit()
 	return result[0:lenPlayers], nil
 }
+
+// DeleteByID inserts players into db
+func DeleteByID(playerID uint64) (uint64, error) {
+	tx, err := db.Begin()
+	if err != nil {
+		log.Printf("error starting tx: %v\n", err)
+		err2 := rescueDb()
+		if err2 != nil {
+			logErr(err2)
+			return 0, err
+		}
+		// time.Sleep(3 * time.Second)
+		tx, err2 = db.Begin()
+		if err2 != nil {
+			logErr(err2)
+			return 0, err
+		}
+	}
+
+	row := tx.QueryRow("DELETE FROM players WHERE id=$1 RETURNING id;", playerID)
+	switch err := row.Scan(&playerID); err {
+	case sql.ErrNoRows:
+		log.Printf("error scanning db result: %v\n", err)
+		return 0, err
+	case nil:
+		tx.Commit()
+		return playerID, nil
+	default:
+		log.Printf("error while inserting row: %v\n", err)
+		tx.Rollback()
+		return 0, err
+	}
+}

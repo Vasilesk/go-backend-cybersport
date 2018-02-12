@@ -25,6 +25,8 @@ func SolveMethod(method string, data apiobjects.BaseRequest) apiobjects.IRespons
 		return playersUpdate(&data)
 	case "players.getById":
 		return playersGetByID(&data)
+	case "players.removeById":
+		return playersRemoveByID(&data)
 	case "teams.get":
 		return teamsGet(&data)
 	case "teams.add":
