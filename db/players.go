@@ -196,12 +196,10 @@ func DeleteByID(playerID uint64) (uint64, error) {
 		}
 	}
 
-	row := tx.QueryRow("DELETE FROM players WHERE id=$1 RETURNING id;", playerID)
-	switch err := row.Scan(&playerID); err {
-	case sql.ErrNoRows:
-		log.Printf("error scanning db result: %v\n", err)
-		return 0, err
-	case nil:
+	var buf int64
+	row := tx.QueryRow("DELETE FROM players WHERE id=$1", playerID)
+	switch err := row.Scan(&buf); err {
+	case sql.ErrNoRows, nil:
 		tx.Commit()
 		return playerID, nil
 	default:
